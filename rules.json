@@ -1,0 +1,16 @@
+﻿[
+  {
+    "WorkflowName": "UnlockUserEligibility Workflow",
+    "Rules": [
+      {
+        "RuleName": "UnlockUserEligibility",
+        "Expression": "IsEligibleForUnlock == true",
+        "SuccessEvent": "User unlocked.",
+        "ErrorMessage": "User couldn't be unlocked.",
+        "ErrorType": "Error",
+        "RuleExpressionType": "LambdaExpression",
+        "Enabled": true
+      }
+    ]
+  }
+]

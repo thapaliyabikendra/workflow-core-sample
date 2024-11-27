@@ -1,8 +1,22 @@
+using ACMS.WebApi;
+using Microsoft.Extensions.Hosting;
+using System.Dynamic;
+using WorkflowCore.Interface;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddWorkflow();
+
+// Configure RulesEngine (with rule loading service)
+builder.Services.AddSingleton<RuleService>();
+builder.Services.AddTransient<UnlockUserApp1Step>();
+builder.Services.AddTransient<UnlockUserApp2Step>();
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var ruleService = serviceProvider.GetRequiredService<RuleService>();
+    return ruleService.GetRulesEngine();
+});
 
 var app = builder.Build();
 
@@ -13,29 +27,27 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
+app.MapPost("/api/unlock", async (UnlockRequest request, IWorkflowHost workflowHost, RuleService ruleService) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    // Load the rules engine
+    var rulesEngine = ruleService.GetRulesEngine();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    // Evaluate rules (example)
+    var evaluator = new RuleEvaluator(rulesEngine);
+    await evaluator.EvaluateRulesAsync();
 
-app.Run();
+    // Start the workflow
+    var workflowData = new Dictionary<string, object>
+    {
+        { "UserId", request.UserId }
+    };
+    await workflowHost.StartWorkflow("UnlockUserWorkflow", workflowData);
+    //await workflowHost.StopAsync(default);
+    return Results.Ok("Workflow started for user unlock.");
+});
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+var workflowHost = app.Services.GetService<IWorkflowHost>();
+workflowHost.RegisterWorkflow<UnlockUserWorkflow>();
+await workflowHost.StartAsync(default);
+
+await app.RunAsync();

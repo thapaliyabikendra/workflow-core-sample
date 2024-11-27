@@ -1,6 +1,9 @@
 @ACMS.WebApi_HostAddress = http://localhost:5283
 
-GET {{ACMS.WebApi_HostAddress}}/weatherforecast/
+POST {{ACMS.WebApi_HostAddress}}/api/unlock
+Content-Type: application/json
 Accept: application/json
 
-###
+{
+  "UserId": "user123"
+}
