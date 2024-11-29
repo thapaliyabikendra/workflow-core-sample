@@ -1,0 +1,21 @@
+﻿@HostAddress = http://localhost:5283
+
+### Send approved request
+POST {{HostAddress}}/api/webhook
+Content-Type: application/json
+Accept: application/json
+
+{
+  "TaskId": "1",
+  "ApprovalStatus": "Approved"
+}
+
+### Send rejected request
+POST {{HostAddress}}/api/webhook
+Content-Type: application/json
+Accept: application/json
+
+{
+  "TaskId": "1",
+  "ApprovalStatus": "Rejected"
+}
