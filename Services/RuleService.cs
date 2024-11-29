@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RulesEngine.Models;
 
-namespace ACMS.WebApi;
+namespace ACMS.WebApi.Services;
 
 public class RuleService
 {
@@ -10,7 +10,7 @@ public class RuleService
     public RuleService(IConfiguration configuration)
     {
         // Load the rules from JSON file
-        var workflows = LoadRulesFromJson("rules.json");
+        var workflows = LoadRulesFromJson("Workflows/UnlockUser/rules.json");
 
         // Initialize RulesEngine with workflows
         _rulesEngine = new RulesEngine.RulesEngine(workflows.ToArray());

@@ -1,0 +1,18 @@
+﻿{
+  "Id": "UnlockUserWorkflow",
+  "Version": 1,
+  "Steps": [
+    {
+      "Id": "UnlockUserApp1Step",
+      "StepType": "ACMS.WebApi.Workflows.UnlockUser.UnlockUserApp1Step, ACMS.WebApi",
+      "NextStepId": "UnlockUserApp2Step",
+      "Inputs": {
+        "AppType": "\"Finacle\""
+      }
+    },
+    {
+      "Id": "UnlockUserApp2Step",
+      "StepType": "ACMS.WebApi.Workflows.UnlockUser.UnlockUserApp2Step, ACMS.WebApi"
+    }
+  ]
+}

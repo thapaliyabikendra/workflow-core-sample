@@ -1,12 +1,15 @@
-using ACMS.WebApi;
+using ACMS.WebApi.Services;
+using ACMS.WebApi.Workflows.UnlockUser;
 using Microsoft.Extensions.Hosting;
 using System.Dynamic;
 using WorkflowCore.Interface;
+using WorkflowCore.Services.DefinitionStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddWorkflow();
+builder.Services.AddWorkflowDSL();  // Register WorkflowCore.DSL
 
 // Configure RulesEngine (with rule loading service)
 builder.Services.AddSingleton<RuleService>();
@@ -20,6 +23,12 @@ builder.Services.AddSingleton(serviceProvider =>
 
 var app = builder.Build();
 
+var workflowJson = File.ReadAllText("Workflows/UnlockUser/workflow.json");  // Path to your workflow JSON file
+var loader = app.Services.GetRequiredService<IDefinitionLoader>();
+
+// Load the workflow definition from the JSON string
+loader.LoadDefinition(workflowJson, Deserializers.Json);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -27,27 +36,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapPost("/api/unlock", async (UnlockRequest request, IWorkflowHost workflowHost, RuleService ruleService) =>
+app.MapPost("/api/unlock", async (UnlockRequest request, IWorkflowHost workflowHost, IServiceProvider serviceProvider) =>
 {
-    // Load the rules engine
-    var rulesEngine = ruleService.GetRulesEngine();
-
-    // Evaluate rules (example)
-    var evaluator = new RuleEvaluator(rulesEngine);
-    await evaluator.EvaluateRulesAsync();
-
-    // Start the workflow
+    // Prepare workflow data
     var workflowData = new Dictionary<string, object>
-    {
-        { "UserId", request.UserId }
-    };
-    await workflowHost.StartWorkflow("UnlockUserWorkflow", workflowData);
-    //await workflowHost.StopAsync(default);
-    return Results.Ok("Workflow started for user unlock.");
+                {
+                    { "UserId", request.UserId }
+                };
+
+    // Start the workflow with input data
+    await workflowHost.StartWorkflow("UnlockUserWorkflow", workflowData);  // "UnlockUserWorkflow" is the workflow Id
+    return Results.Ok("Workflow started.");
 });
-
 var workflowHost = app.Services.GetService<IWorkflowHost>();
-workflowHost.RegisterWorkflow<UnlockUserWorkflow>();
 await workflowHost.StartAsync(default);
-
 await app.RunAsync();

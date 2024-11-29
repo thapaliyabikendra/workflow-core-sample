@@ -1,6 +1,6 @@
 ﻿using WorkflowCore.Interface;
 
-namespace ACMS.WebApi;
+namespace ACMS.WebApi.Workflows.UnlockUser;
 
 public class UnlockUserWorkflow : IWorkflow
 {

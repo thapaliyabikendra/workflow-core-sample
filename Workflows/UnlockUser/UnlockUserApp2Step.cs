@@ -1,7 +1,7 @@
 ﻿using WorkflowCore.Interface;
 using WorkflowCore.Models;
 
-namespace ACMS.WebApi;
+namespace ACMS.WebApi.Workflows.UnlockUser;
 
 public class UnlockUserApp2Step : StepBody
 {
@@ -12,7 +12,7 @@ public class UnlockUserApp2Step : StepBody
         // Unlock user in App2
         using (var client = new HttpClient())
         {
-            var response = client.PostAsJsonAsync("https://api.app2.com/unlock", new { UserId = UserId }).Result;
+            var response = client.PostAsJsonAsync("https://api.app2.com/unlock", new { UserId }).Result;
 
             if (response.IsSuccessStatusCode)
             {

@@ -1,4 +1,4 @@
-﻿namespace ACMS.WebApi;
+﻿namespace ACMS.WebApi.Workflows.UnlockUser;
 
 public class UnlockUserContext
 {
