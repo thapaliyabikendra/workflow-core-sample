@@ -8,6 +8,7 @@ public class NotifyEmployeeStep : StepBodyAsync
     public string TaskId { get; set; }  // TaskId passed from previous steps
     public string EmployeeEmail { get; set; }
     public string TransferOutcome { get; set; }
+    public string ApprovalStatus { get; set; }
 
     public override async Task<ExecutionResult> RunAsync(IStepExecutionContext context)
     {
@@ -18,7 +19,7 @@ public class NotifyEmployeeStep : StepBodyAsync
         await SendNotificationAsync(EmployeeEmail, TransferOutcome);
 
         // Log successful notification
-        Console.WriteLine($"[{TaskId}] Notification sent to employee.");
+        Console.WriteLine($"[{TaskId}] Notification sent to employee about Approval Status {ApprovalStatus}.");
 
         return ExecutionResult.Next(); // End the workflow or continue with more steps
     }

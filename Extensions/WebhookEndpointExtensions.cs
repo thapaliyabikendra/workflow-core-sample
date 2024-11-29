@@ -19,7 +19,7 @@ public static class WebhookEndpointExtensions
             }
 
             // Trigger the event for the workflow
-            await workflowHost.PublishEvent("BPMAPIApprovalResponseEvent", "0", payload.ApprovalStatus);
+            await workflowHost.PublishEvent("BPMAPIApprovalResponseEvent", payload.TaskId, payload.ApprovalStatus);
 
             context.Response.StatusCode = StatusCodes.Status200OK;
             await context.Response.WriteAsync($"Event for TaskId: {payload.TaskId} triggered with status: {payload.ApprovalStatus}");

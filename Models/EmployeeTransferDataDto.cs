@@ -7,5 +7,7 @@ public class EmployeeTransferDataDto
     public string ToBranch { get; set; }
     public string TaskId { get; set; }
     public string ApprovalStatus { get; set; }
+    public bool IsDataPolled { get; set; }
     public int PollingCount { get; set; }
+    public string UiPathJobId { get; set; }
 }

@@ -6,7 +6,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "TaskId": "1",
+  "TaskId": "071c4bf2-619f-4eb5-862a-f053dc859765",
   "ApprovalStatus": "Approved"
 }
 
@@ -16,6 +16,6 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "TaskId": "1",
+  "TaskId": "0f668980-d631-4bbc-8f7b-929f73362d52",
   "ApprovalStatus": "Rejected"
 }

@@ -13,7 +13,7 @@ public class GenerateTaskIdStep : StepBodyAsync
         TaskId = Guid.NewGuid().ToString();
 
         // Log the generated Task ID (useful for debugging)
-        Console.WriteLine($"Generated Task ID: {TaskId}");
+        Console.WriteLine($"[{TaskId}] Generated Task ID");
 
         // Pass the TaskId to the next step
         return ExecutionResult.Next(); // Continue to the next step
