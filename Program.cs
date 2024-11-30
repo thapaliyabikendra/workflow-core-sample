@@ -6,8 +6,7 @@ using ACMS.WebApi.Utilities;
 using ACMS.WebApi.Workflows.Transfers;
 using ACMS.WebApi.Workflows.UnlockUser;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+using Nest;
 using WorkflowCore.Interface;
 using WorkflowCore.Services.DefinitionStorage;
 
@@ -15,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
-builder.Services.AddWorkflow();
+builder.Services.AddWorkflow(cfg =>
+{
+	cfg.UseElasticsearch(new ConnectionSettings(new Uri("http://localhost:9200")), "ACMS_Workflows_index");
+});
 builder.Services.AddWorkflowDSL();  // Register WorkflowCore.DSL
 
 // Configure RulesEngine (with rule loading service)
@@ -59,6 +61,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapWorkflowEndpoints();
 app.MapEmployeeEndpoints();
 app.MapWebhookEndpoints();  // This maps the /api/webhook endpoint
 

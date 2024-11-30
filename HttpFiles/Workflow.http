@@ -1,0 +1,57 @@
+﻿@HostAddress = http://localhost:5283
+
+### 1. Get All Workflows (Search for workflows)
+GET {{HostAddress}}/api/workflows?terms=&status=2&type=&skip=0&take=10
+
+Parameters:
+- terms (string): Search terms.
+- status (enum - WorkflowStatus): Workflow status to filter by.
+- type (string): Workflow type (Definition ID).
+- createdFrom (datetime): Start date range for created workflows.
+- createdTo (datetime): End date range for created workflows.
+- skip (int): Number of workflows to skip (for pagination).
+- take (int): Number of workflows to return (pagination).
+
+Response:
+200 OK
+{
+  "totalCount": 10,
+  "results": [
+    {
+      "id": "workflow_id_1",
+      "status": "Running",
+      "createdTime": "2024-11-01T12:00:00Z",
+      "type": "workflow_type_1"
+    },
+    ...
+  ]
+}
+
+### 2. Get a Single Workflow by ID
+GET {{HostAddress}}/api/workflows/905f8d9b-8828-46aa-a166-b08565fa3ecd
+
+Parameters:
+- id (string): The workflow ID.
+
+Response:
+200 OK
+{
+  "id": "workflow_id_1",
+  "status": "Running",
+  "createdTime": "2024-11-01T12:00:00Z",
+  "type": "workflow_type_1",
+  "data": {...}  // Workflow-specific data
+}
+
+### 3. Start a Workflow (Post with data)
+POST {{HostAddress}}/api/workflows/905f8d9b-8828-46aa-a166-b08565fa3ecd
+
+Parameters:
+- id (string): The workflow definition ID.
+- version (int, optional): The version of the workflow definition (if provided).
+- reference (string, optional): Reference for the workflow instance.
+- body (JSON): The data payload to start the workflow (optional, depending on the definition).
+
+{
+  "key": "value"
+}

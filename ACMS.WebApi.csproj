@@ -18,6 +18,7 @@
     <PackageReference Include="RulesEngine" Version="5.0.3" />
     <PackageReference Include="WorkflowCore" Version="3.11.0" />
     <PackageReference Include="WorkflowCore.DSL" Version="3.11.0" />
+    <PackageReference Include="WorkflowCore.Providers.Elasticsearch" Version="3.11.0" />
   </ItemGroup>
 
   <ItemGroup>
