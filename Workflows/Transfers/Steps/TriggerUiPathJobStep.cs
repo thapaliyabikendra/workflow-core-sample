@@ -16,6 +16,8 @@ public class TriggerUiPathJobStep : StepBodyAsync
         UiPathJobId = await TriggerUiPathJobAsync();
         Console.WriteLine($"JobId - [{UiPathJobId}] Triggering UiPath job.");
 
+        //throw new Exception("Test exception");
+
         // Pass the UiPath Job ID to the next step
         return ExecutionResult.Next(); // Proceed to the next step
     }

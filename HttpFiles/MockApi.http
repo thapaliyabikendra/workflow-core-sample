@@ -1,0 +1,11 @@
+﻿@HostAddress = http://localhost:3000
+
+### Send approval request to BPM api
+POST {{HostAddress}}/bpm/api/approval-request?taskId=e81f0a11-a62b-4f0e-9bdf-285663861035&userId=1
+Content-Type: application/json
+Accept: application/json
+
+### Send approval request to BPM api (Failed scenario)
+POST {{HostAddress}}/bpm/api/approval-request?taskId=e81f0a11-a62b-4f0e-9bdf-285663861035&userId=2
+Content-Type: application/json
+Accept: application/json

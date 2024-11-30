@@ -28,7 +28,7 @@ Response:
 }
 
 ### 2. Get a Single Workflow by ID
-GET {{HostAddress}}/api/workflows/905f8d9b-8828-46aa-a166-b08565fa3ecd
+GET {{HostAddress}}/api/workflows/dc7a2863-ae83-4636-a4d6-3108efb920c6
 
 Parameters:
 - id (string): The workflow ID.

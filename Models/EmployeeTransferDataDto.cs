@@ -1,4 +1,6 @@
-﻿namespace ACMS.WebApi.Models;
+﻿using Newtonsoft.Json.Linq;
+
+namespace ACMS.WebApi.Models;
 
 public class EmployeeTransferDataDto
 {
@@ -10,4 +12,7 @@ public class EmployeeTransferDataDto
     public bool IsDataPolled { get; set; }
     public int PollingCount { get; set; }
     public string UiPathJobId { get; set; }
+    public JObject ApiResponse1 { get; set; } 
+    public JObject ApiResponse2 { get; set; } 
+    public JObject ApiResponse3 { get; set; }
 }

@@ -4,6 +4,7 @@ using ACMS.WebApi.Models;
 using ACMS.WebApi.Services;
 using ACMS.WebApi.Utilities;
 using ACMS.WebApi.Workflows.Transfers;
+using ACMS.WebApi.Workflows.Transfers.Steps;
 using ACMS.WebApi.Workflows.UnlockUser;
 using Microsoft.EntityFrameworkCore;
 using Nest;
@@ -11,18 +12,20 @@ using WorkflowCore.Interface;
 using WorkflowCore.Services.DefinitionStorage;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var sqliteConnectionString = @"Data Source=employees.db;";
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
 builder.Services.AddWorkflow(cfg =>
 {
-	cfg.UseElasticsearch(new ConnectionSettings(new Uri("http://localhost:9200")), "ACMS_Workflows_index");
+    //cfg.UseSqlite(sqliteConnectionString, true);
+    cfg.UseElasticsearch(new ConnectionSettings(new Uri("http://localhost:9200")), "ACMS_Workflows_index");
 });
 builder.Services.AddWorkflowDSL();  // Register WorkflowCore.DSL
 
 // Configure RulesEngine (with rule loading service)
 builder.Services.AddSingleton<DynamicHttpClientService>();
 builder.Services.AddSingleton<RuleService>();
+builder.Services.AddTransient<CallBPMApiStep>();
 builder.Services.AddTransient<UnlockUserApp1Step>();
 builder.Services.AddTransient<UnlockUserApp2Step>();
 builder.Services.AddSingleton(serviceProvider =>
@@ -31,9 +34,9 @@ builder.Services.AddSingleton(serviceProvider =>
     return ruleService.GetRulesEngine();
 });
 // Register the EmployeeContext and configure SQLite
-builder.Services.AddDbContext<EmployeeContext>(options =>
-    options.UseSqlite("Data Source=employees.db"));
-
+builder.Services
+    .AddDbContext<EmployeeContext>(options =>
+        options.UseSqlite(sqliteConnectionString));
 
 
 var app = builder.Build();

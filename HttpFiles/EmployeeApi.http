@@ -20,7 +20,7 @@ Accept: application/json
 }
 
 ### Transfer an employee to a different branch
-POST {{HostAddress}}/api/employees/1/transfer?newBranch=Branch%2B HTTP/1.1
+POST {{HostAddress}}/api/employees/2/transfer?newBranch=Branch%2B HTTP/1.1
 Accept: application/json
 
 ### Delete an employee by ID
