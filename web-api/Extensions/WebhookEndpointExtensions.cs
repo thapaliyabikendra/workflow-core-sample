@@ -11,7 +11,7 @@ public static class WebhookEndpointExtensions
         {
             var payload = await context.Request.ReadFromJsonAsync<WebhookPayload>();
 
-            if (string.IsNullOrEmpty(payload?.TaskId))
+            if (string.IsNullOrWhiteSpace(payload?.TaskId))
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 await context.Response.WriteAsync("Task Id is required.");

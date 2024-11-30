@@ -26,6 +26,8 @@ builder.Services.AddWorkflowDSL();  // Register WorkflowCore.DSL
 builder.Services.AddSingleton<DynamicHttpClientService>();
 builder.Services.AddSingleton<RuleService>();
 builder.Services.AddTransient<CallBPMApiStep>();
+builder.Services.AddTransient<TriggerUiPathJobStep>();
+builder.Services.AddTransient<PollUiPathJobStatusStep>();
 builder.Services.AddTransient<UnlockUserApp1Step>();
 builder.Services.AddTransient<UnlockUserApp2Step>();
 builder.Services.AddSingleton(serviceProvider =>

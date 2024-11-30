@@ -2,21 +2,37 @@ const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const uuid = require('uuid');  // To generate unique UiPathJobIds
+const https = require('https')
 
 const app = express();
 const port = process.env.PORT || 3000;
-
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
 // In-memory "database" to store UiPath jobs and their statuses
 let jobs = {};
+const axiosInstance = axios.create({
+    https: {
+        checkServerIdentity: (host, cert) => {
+            // Customize certificate verification here, returning an error if the
+            // certificate is invalid or should not be trusted.
+        }
+    },
+    validateStatus: status => {
+        // Only reject responses with status codes outside the 2xx range
+        return status >= 200 && status < 300;
+    },
+    httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+    })
+});
+
 
 // Endpoint to start a UiPath job
 app.post('/ui-path/api/start-job', async (req, res) => {
     try {
-           // Get taskId from query parameters
-           const { taskId } = req.query.taskId;
+        // Get taskId from query parameters
+        const { taskId } = req.query;
         // Generate a unique UiPath Job ID
         const uiPathJobId = uuid.v4();
 
@@ -37,7 +53,7 @@ app.post('/ui-path/api/start-job', async (req, res) => {
         setTimeout(() => {
             jobs[uiPathJobId].status = 'Ended';
             console.log(`UiPath Job ${uiPathJobId} status updated to "Ended"`);
-        }, 10000);  // Simulate job completion after 5 seconds
+        }, 4000);  // Simulate job completion after 5 seconds
 
     } catch (error) {
         console.error('Error starting UiPath job:', error);
@@ -103,7 +119,7 @@ app.post('/bpm/api/approval-request', async (req, res) => {
             console.log(`'Response: ${JSON.stringify(successResponse)}'`);
             res.status(200).json(successResponse);
 
-            setTimeout(() => callWebhook(req.query.TaskId, 'Approved'), 5000);
+            setTimeout(() => callWebhook(req.query.taskId, 'Approved'), 5000);
         } else {
             const failedResponse = {
                 success: false,
@@ -128,12 +144,14 @@ app.post('/bpm/api/approval-request', async (req, res) => {
 // Utility function to send webhook
 async function callWebhook(taskId, approvalStatus) {
     const webhookData = {
-        TaskId: taskId,
-        ApprovalStatus: approvalStatus
+        taskId: taskId,
+        approvalStatus: approvalStatus
     };
 
+    console.log(`'Request: ${JSON.stringify(webhookData)}'`);
+
     try {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
             'http://localhost:5283/api/webhook',
             webhookData,
             {

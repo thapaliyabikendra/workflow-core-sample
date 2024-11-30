@@ -5,17 +5,8 @@ using System.Text;
 
 namespace ACMS.WebApi.Services;
 
-public class DynamicHttpClientService
+public class DynamicHttpClientService(HttpClient httpClient, ILogger<DynamicHttpClientService> logger)
 {
-    private readonly HttpClient _httpClient;
-    private readonly ILogger<DynamicHttpClientService> _logger;
-
-    public DynamicHttpClientService(HttpClient httpClient, ILogger<DynamicHttpClientService> logger)
-    {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     #region Public Methods
     public async Task<JObject> CreateHttpClientAsync(CreateHttpClientDto input)
     {
@@ -27,17 +18,17 @@ public class DynamicHttpClientService
             // Construct URL with query parameters
             var url = BuildUrlWithQueryParams(requestConfig);
 
-            _logger.LogInformation("Constructed URL: {Url}", url);
+            logger.LogInformation("Constructed URL: {Url}", url);
 
             // Create HTTP request
             var request = CreateHttpRequestMessage(requestConfig, url);
 
             // Send the HTTP request
-            var response = await _httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
             var responseBody = await response.Content.ReadAsStringAsync();
-            _logger.LogDebug("Received response: {ResponseBody}", responseBody);
+            logger.LogDebug("Received response: {ResponseBody}", responseBody);
 
             // If the response is a JSON array, parse it as a JArray
             var parsedResponse = JToken.Parse(responseBody);
@@ -55,12 +46,12 @@ public class DynamicHttpClientService
             }
 
             // If neither, log and return an empty JObject or handle the case as needed
-            _logger.LogWarning("Unexpected response format.");
+            logger.LogWarning("Unexpected response format.");
             throw new Exception("Unexpected response format");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
+            logger.LogError(ex, "An unexpected error occurred.");
             throw new ApplicationException("An unexpected error occurred.", ex);
         }
     }
