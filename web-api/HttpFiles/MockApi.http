@@ -9,3 +9,12 @@ Accept: application/json
 POST {{HostAddress}}/bpm/api/approval-request?taskId=e81f0a11-a62b-4f0e-9bdf-285663861035&userId=2
 Content-Type: application/json
 Accept: application/json
+
+### Start UiPath Job - POST request
+POST http://localhost:3000/ui-path/api/start-job?taskId=e81f0a11-a62b-4f0e-9bdf-285663861035
+Content-Type: application/json
+Accept: application/json
+
+### Get UiPath Job Status - GET request
+GET http://localhost:3000/ui-path/api/job-status?uiPathJobId=515655b1-cefe-4b1c-819b-d7d32be935e9
+Accept: application/json
