@@ -127,7 +127,7 @@ app.post('/bpm/api/approval-request', async (req, res) => {
                 message: 'Internal Server Error'
             };
             console.log(`'Response: ${JSON.stringify(failedResponse)}'`);
-            res.status(200).json(failedResponse);
+            res.status(500).json(failedResponse);
         }
     } catch (error) {
         console.error('Error calling BPM API:', error);

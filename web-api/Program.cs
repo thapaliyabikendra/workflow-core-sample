@@ -52,7 +52,8 @@ using (var scope = app.Services.CreateScope())
     DataSeeder.Seed(dbContext);
 }
 
-var workflowJson = File.ReadAllText("Workflows/UnlockUser/workflow.json");  // Path to your workflow JSON file
+//var workflowJson = File.ReadAllText("Workflows/UnlockUser/workflow.json");  // Path to your workflow JSON file
+var workflowJson = File.ReadAllText("Workflows/Transfers/EmployeeTransferWorkflow.json"); 
 var loader = app.Services.GetRequiredService<IDefinitionLoader>();
 
 // Load the workflow definition from the JSON string
@@ -71,6 +72,6 @@ app.MapEmployeeEndpoints();
 app.MapWebhookEndpoints();  // This maps the /api/webhook endpoint
 
 var workflowHost = app.Services.GetService<IWorkflowHost>();
-workflowHost.RegisterWorkflow<EmployeeTransferWorkflow, EmployeeTransferDataDto>();
+//workflowHost.RegisterWorkflow<EmployeeTransferWorkflow, EmployeeTransferDataDto>();
 await workflowHost.StartAsync(default);
 await app.RunAsync();

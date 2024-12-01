@@ -1,7 +1,7 @@
 ﻿@HostAddress = http://localhost:5283
 
 ### 1. Get All Workflows (Search for workflows)
-GET {{HostAddress}}/api/workflows?terms=&status=2&type=&skip=0&take=10
+GET {{HostAddress}}/api/workflows?terms=&status=0&type=&skip=0&take=100
 
 Parameters:
 - terms (string): Search terms.
