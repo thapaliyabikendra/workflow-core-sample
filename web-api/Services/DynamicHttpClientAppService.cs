@@ -8,7 +8,7 @@ namespace ACMS.WebApi.Services;
 public class DynamicHttpClientService(HttpClient httpClient, ILogger<DynamicHttpClientService> logger)
 {
     #region Public Methods
-    public async Task<JObject> CreateHttpClientAsync(CreateHttpClientDto input)
+    public async Task<Dictionary<string, object>> CreateHttpClientAsync(CreateHttpClientDto input)
     {
         try
         {
@@ -30,20 +30,12 @@ public class DynamicHttpClientService(HttpClient httpClient, ILogger<DynamicHttp
             var responseBody = await response.Content.ReadAsStringAsync();
             logger.LogDebug("Received response: {ResponseBody}", responseBody);
 
-            // If the response is a JSON array, parse it as a JArray
+            //// If the response is a JSON array, parse it as a JArray
             var parsedResponse = JToken.Parse(responseBody);
+            var jObject =  GetJObject(parsedResponse);
 
-            if (parsedResponse is JArray responseArray)
-            {
-                // You can map the array response into a JObject if needed, or return the JArray directly
-                // For example, we return the array as a JObject for now.
-                return JObject.FromObject(new { data = responseArray });
-            }
-            else if (parsedResponse is JObject responseObject)
-            {
-                // If the response is a single object, handle it as a JObject
-                return responseObject;
-            }
+            var finalResult = ConvertToDynamicDictionary(jObject);
+            return finalResult;
 
             // If neither, log and return an empty JObject or handle the case as needed
             logger.LogWarning("Unexpected response format.");
@@ -56,9 +48,46 @@ public class DynamicHttpClientService(HttpClient httpClient, ILogger<DynamicHttp
         }
     }
 
+    private static JObject GetJObject(JToken parsedResponse)
+    {
+        if (parsedResponse is JArray responseArray)
+        {
+            // You can map the array response into a JObject if needed, or return the JArray directly
+            // For example, we return the array as a JObject for now.
+            return JObject.FromObject(new { data = responseArray });
+        }
+        else if (parsedResponse is JObject responseObject)
+        {
+            // If the response is a single object, handle it as a JObject
+            return responseObject;
+        }
+        return new JObject();
+    }
+
     #endregion
 
     #region Private Methods
+    private Dictionary<string, object> ConvertToDynamicDictionary(JObject jObject)
+    {
+        var dictionary = new Dictionary<string, object>();
+
+        foreach (var property in jObject.Properties())
+        {
+            dictionary[property.Name] = ConvertJTokenToValue(property.Value);
+        }
+
+        return dictionary;
+    }
+
+    private object ConvertJTokenToValue(JToken token)
+    {
+        return token.Type switch
+        {
+            JTokenType.Object => ConvertToDynamicDictionary((JObject)token),
+            JTokenType.Array => token.Select(ConvertJTokenToValue).ToList(),
+            _ => token.ToObject<object>()
+        };
+    }
 
     private string BuildUrlWithQueryParams(Dictionary<string, object> requestConfig)
     {

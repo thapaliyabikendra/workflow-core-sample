@@ -11,7 +11,7 @@ public class CallApiStep(DynamicHttpClientService httpClientService, ILogger<Cal
     private readonly ILogger _logger = logger;
 
     public string RequestConfigJson { get; set; }
-    public JObject Response { get; set; }
+    public Dictionary<string, object> Response { get; set; }
 
     public override async Task<ExecutionResult> RunAsync(IStepExecutionContext context)
     {

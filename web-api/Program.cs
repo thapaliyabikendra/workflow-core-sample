@@ -8,6 +8,7 @@ using ACMS.WebApi.Workflows.Transfers.Steps;
 using ACMS.WebApi.Workflows.UnlockUser;
 using Microsoft.EntityFrameworkCore;
 using Nest;
+using System.Linq.Dynamic.Core;
 using WorkflowCore.Interface;
 using WorkflowCore.Services.DefinitionStorage;
 
@@ -53,7 +54,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 //var workflowJson = File.ReadAllText("Workflows/UnlockUser/workflow.json");  // Path to your workflow JSON file
-var workflowJson = File.ReadAllText("Workflows/Transfers/EmployeeTransferWorkflow.json"); 
+//var workflowJson = File.ReadAllText("Workflows/Transfers/EmployeeTransferWorkflow.json"); 
+var workflowJson = File.ReadAllText("Workflows/Transfers/EmployeeTransferWorkflowWithDynamicData.json");
 var loader = app.Services.GetRequiredService<IDefinitionLoader>();
 
 // Load the workflow definition from the JSON string
@@ -73,5 +75,6 @@ app.MapWebhookEndpoints();  // This maps the /api/webhook endpoint
 
 var workflowHost = app.Services.GetService<IWorkflowHost>();
 //workflowHost.RegisterWorkflow<EmployeeTransferWorkflow, EmployeeTransferDataDto>();
+//workflowHost.RegisterWorkflow<EmployeeTransferWorkflowWithDynamicData, DynamicData>();
 await workflowHost.StartAsync(default);
 await app.RunAsync();

@@ -67,7 +67,7 @@ public class PollUiPathJobStatusStep(DynamicHttpClientService dynamicHttpClientS
         var response = await dynamicHttpClientService.CreateHttpClientAsync(inputDto);
 
         // Log the response (optional)
-        logger.LogInformation("UiPath Job status response: {response}", response);
+        logger.LogInformation("UiPath Job status response: {Response}", response);
 
         // Assuming the response contains a field for the job status, e.g., "JobStatus"
         // If the API returns a JSON response like: { "JobStatus": "Ended" }

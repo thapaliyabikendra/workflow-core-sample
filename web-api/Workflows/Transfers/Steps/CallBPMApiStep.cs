@@ -11,7 +11,8 @@ public class CallBPMApiStep(DynamicHttpClientService dynamicHttpClientService, I
 {
     public string TaskId { get; set; }  // TaskId passed from the previous step
     public int UserId { get; set; }  // TaskId passed from the previous step
-    public JObject Response { get; set; }  
+    public string ResponsePrefix { get; set; }  
+    public Dictionary<string, object> Response { get; set; }
 
     public override async Task<ExecutionResult> RunAsync(IStepExecutionContext context)
     {
@@ -23,7 +24,7 @@ public class CallBPMApiStep(DynamicHttpClientService dynamicHttpClientService, I
         return ExecutionResult.Next();
     }
 
-    private async Task<JObject> CallBPMApiAsync()
+    private async Task<Dictionary<string, object>> CallBPMApiAsync()
     {
         // Define your BPM API request configuration
         var requestConfigJson = new JObject

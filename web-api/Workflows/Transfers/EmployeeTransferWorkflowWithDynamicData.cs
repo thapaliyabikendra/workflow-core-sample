@@ -16,10 +16,10 @@ public class EmployeeTransferWorkflowWithDynamicData : IWorkflow<DynamicData>
             .StartWith<TriggerUiPathJobStep>()
                 .Input(step => step.TaskId, data => data["TaskId"])
                 .Output(data => data["UiPathJobId"], step => step.UiPathJobId)
-                //.OnError(WorkflowErrorHandling.Retry, TimeSpan.FromSeconds(10))
+            //.OnError(WorkflowErrorHandling.Retry, TimeSpan.FromSeconds(10))
             .Schedule(data => TimeSpan.FromSeconds(2))
                 .Do(schedule => schedule
-                    .Recur(data => TimeSpan.FromSeconds(3), data => object.Equals(data["IsDataPolled"], true) ||  (data["PollingCount"] as int?) > 5)
+                    .Recur(data => TimeSpan.FromSeconds(3), data => object.Equals(data["IsDataPolled"], true) || Convert.ToInt32(data["PollingCount"]) > 5)
                         .Do(recur => recur
                             .StartWith<PollUiPathJobStatusStep>()
                                 .Input(step => step.IsDataPolled, data => data["IsDataPolled"])
@@ -29,7 +29,7 @@ public class EmployeeTransferWorkflowWithDynamicData : IWorkflow<DynamicData>
                                 .Output(data => data["IsDataPolled"], step => step.IsDataPolled)
                                 .Output(data => data["PollingCount"], step => step.PollingCount)
                             .If(data => true)
-                                .Do(then => 
+                                .Do(then =>
                                     then.StartWith<NotifyEmployeeStep>()
                                             .Input(step => step.TaskId, data => data["TaskId"])
                                             .Input(step => step.ApprovalStatus, data => data["ApprovalStatus"])
@@ -55,7 +55,7 @@ public class EmployeeTransferWorkflowWithDynamicData : IWorkflow<DynamicData>
                 .Input(step => step.UserId, data => data["UserId"])
                 .Output(data => data["ApiResponse1"], step => step.Response)
             //.OnError(WorkflowErrorHandling.Terminate)
-            .If(data => (data["ApiResponse1"] as JObject).Value<bool>("success")) // if relevant http status code is not returned
+            .If(data => Convert.ToBoolean(data.ToJObject("ApiResponse1")["success"])) // if relevant http status code is not returned
             .Do(s =>
                  s.Then(context => Console.WriteLine("[] BPM API Approval Request failed."))
                  .EndWorkflow()

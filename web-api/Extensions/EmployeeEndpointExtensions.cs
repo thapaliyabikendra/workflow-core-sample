@@ -51,14 +51,26 @@ public static class EmployeeEndpointExtensions
             }
 
             // Prepare the data for the workflow
-            var workflowData = new EmployeeTransferDataDto
+            //var workflowData = new EmployeeTransferDataDto
+            //{
+            //    UserId = id,
+            //    FromBranch = employee.Branch,
+            //    ToBranch = newBranch,
+            //};
+            //// Start the workflow
+            //await workflowHost.StartWorkflow("EmployeeTransferWorkflow", workflowData);
+
+            var initialData = new DynamicData
             {
-                UserId = id,
-                FromBranch = employee.Branch,
-                ToBranch = newBranch,
+                //["TaskId"] = Guid.Empty,
+                ["UserId"] = id,
+                //["IsDataPolled"] = false,
+                //["PollingCount"] = 0,
+                //["UiPathJobId"] = string.Empty,
+                ["FromBranch"] = employee.Branch,
+                ["ToBranch"] = newBranch
             };
-            // Start the workflow
-            await workflowHost.StartWorkflow("EmployeeTransferWorkflow", workflowData);
+            await workflowHost.StartWorkflow("EmployeeTransferWorkflow", initialData);
 
             return Results.Ok("Workflow started.");
 
