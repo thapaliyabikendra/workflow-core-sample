@@ -16,7 +16,7 @@ public class NotifyEmployeeStep : StepBodyAsync
         await SendNotificationAsync(EmployeeEmail, TransferOutcome);
 
         // Log successful notification
-        Console.WriteLine($"{TaskId} - Notification sent to employee: {EmployeeEmail} about Approval Status {ApprovalStatus}.");
+        //Console.WriteLine($"{TaskId} - Notification sent to employee: {EmployeeEmail} about Approval Status {ApprovalStatus}.");
 
         return ExecutionResult.Next(); // End the workflow or continue with more steps
     }
