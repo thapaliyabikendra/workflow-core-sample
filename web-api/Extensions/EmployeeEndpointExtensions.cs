@@ -43,7 +43,7 @@ public static class EmployeeEndpointExtensions
         });
 
         // Transfer employee from one branch to another
-        endpoints.MapPost("/api/employees/{id}/transfer", async (int id, string newBranch, EmployeeContext context, IWorkflowHost workflowHost) =>
+        endpoints.MapPost("/api/employees/{id}/transfer", async (int id, string newBranch, EmployeeContext context, IWorkflowHost workflowHost, ILogger<IEndpointRouteBuilder> logger) =>
         {
             var employee = await context.Employees.FindAsync(id);
             if (employee == null)
@@ -72,9 +72,11 @@ public static class EmployeeEndpointExtensions
                 ["ToBranch"] = newBranch
             };
            
-            await workflowHost.StartWorkflow("EmployeeTransferWorkflow", initialData);
+            var workflowId = await workflowHost.StartWorkflow("EmployeeTransferWorkflow", initialData);
 
-            return Results.Ok("Workflow started.");
+            var msg = $"Workflow Id : {workflowId} - Workflow started.";
+            logger.LogInformation(msg);
+            return Results.Ok(msg);
 
             //// Transfer the employee to the new branch
             //employee.Branch = newBranch;

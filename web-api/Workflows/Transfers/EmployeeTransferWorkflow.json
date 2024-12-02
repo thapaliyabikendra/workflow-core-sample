@@ -2,6 +2,7 @@
   "Id": "EmployeeTransferWorkflow",
   "Version": 1,
   "DataType": "ACMS.WebApi.Models.DynamicData, ACMS.WebApi",
+  "DefaultErrorBehavior": "Terminate",
   "Steps": [
     {
       "Id": "GenerateTaskIdStep",
