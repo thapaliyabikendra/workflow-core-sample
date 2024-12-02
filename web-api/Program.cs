@@ -51,7 +51,8 @@ builder.Host.ConfigureLogging((context, logging) =>
 
       logging.AddFilter("System.Net.Http", LogLevel.Warning); // Set System.Net.Http logs to Warning level
       logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
-      logging.AddFilter("WorkflowCore.Services.BackgroundTasks.IndexConsumer", LogLevel.Error); // Set to Error to suppress Warning level logs
+      logging.AddFilter("WorkflowCore.Services.BackgroundTasks.IndexConsumer", LogLevel.Error);
+      logging.AddFilter("ACMS.WebApi.Services.DynamicHttpClientService", LogLevel.Error); 
   });
 var app = builder.Build();
 

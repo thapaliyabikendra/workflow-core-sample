@@ -12,22 +12,17 @@ public class NotifyEmployeeStep : StepBodyAsync
 
     public override async Task<ExecutionResult> RunAsync(IStepExecutionContext context)
     {
-        // Log the notification attempt with TaskId
-        Console.WriteLine($"[{TaskId}] Sending notification to employee: {EmployeeEmail}");
-
         // Simulate sending a notification (e.g., email, SMS, etc.)
         await SendNotificationAsync(EmployeeEmail, TransferOutcome);
 
         // Log successful notification
-        Console.WriteLine($"[{TaskId}] Notification sent to employee about Approval Status {ApprovalStatus}.");
+        Console.WriteLine($"{TaskId} - Notification sent to employee: {EmployeeEmail} about Approval Status {ApprovalStatus}.");
 
         return ExecutionResult.Next(); // End the workflow or continue with more steps
     }
 
     private Task SendNotificationAsync(string email, string outcome)
     {
-        // Simulate sending an email (in a real app, use an email service)
-        Console.WriteLine($"Notifying {email} about transfer: {outcome}");
         return Task.CompletedTask;
     }
 }

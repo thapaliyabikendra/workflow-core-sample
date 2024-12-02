@@ -39,7 +39,7 @@
             "Id": "BPMApiCallFailureLog",
             "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
             "Inputs": {
-              "Message": "\"[] BPM API Approval Request failed.\""
+              "Message": "data[\"TaskId\"] + \" - BPM API Approval Request failed.\""
             }
           }
         ]
@@ -50,7 +50,7 @@
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
       "NextStepId": "WaitForBPMAPIApprovalResponseEvent",
       "Inputs": {
-        "Message": "\"[] Waiting for BPM API Approval Response Event.\""
+        "Message": "data[\"TaskId\"] + \" - Waiting for BPM API Approval Response Event.\""
       }
     },
     {
@@ -71,7 +71,7 @@
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
       "NextStepId": "DecideApprovalStatus",
       "Inputs": {
-        "Message": "\"[] BPM API Approval Response Event received.\""
+        "Message": "data[\"TaskId\"] + \" - BPM API Approval Response Event received.\""
       }
     },
     {
@@ -149,7 +149,7 @@
                   "NextStepId": "IfPollUiPathJobStatusSuccessStep",
                   "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
                   "Inputs": {
-                    "Message": "\"Job Status: \" + data[\"PollUiPathJobStatus\"] + \", PollingCount:\" + data[\"PollingCount\"]"
+                    "Message": "data[\"TaskId\"] + \" - Job Status: \" + data[\"PollUiPathJobStatus\"] + \", PollingCount: \" + data[\"PollingCount\"]"
                   }
                 },
                 {
@@ -173,7 +173,7 @@
                         "Id": "WorkflowEndedLogStep",
                         "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
                         "Inputs": {
-                          "Message": "\"[] Workflow Ended 1.\""
+                          "Message": "data[\"TaskId\"] + \" - Workflow Ended 1.\""
                         }
                       }
                     ]
@@ -198,7 +198,7 @@
       "Id": "WorkflowEndedLogStep2",
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
       "Inputs": {
-        "Message": "\"[] Workflow Ended 2.\""
+        "Message": "data[\"TaskId\"] + \" - Workflow Ended 2.\""
       }
     }
   ]

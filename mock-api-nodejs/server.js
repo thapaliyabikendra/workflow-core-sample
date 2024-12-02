@@ -36,8 +36,8 @@ app.get('/ui-path/api/start-job', async (req, res) => {
         // Generate a unique UiPath Job ID
         const uiPathJobId = uuid.v4();
 
-        // Initially, the job status is "pending"
-        jobs[uiPathJobId] = { status: 'pending' };
+        // Initially, the job status is "Pending"
+        jobs[uiPathJobId] = { status: 'Pending' };
 
         console.log(`TaskId = ${taskId}, UiPath Job started: JobId = ${uiPathJobId}, Status = ${jobs[uiPathJobId].status}`);
 
