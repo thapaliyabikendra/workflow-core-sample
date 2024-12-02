@@ -1,7 +1,7 @@
 ﻿{
   "Id": "EmployeeTransferWorkflow",
   "Version": 1,
-  "DataType": "ACMS.WebApi.Models.EmployeeTransferDataDto, ACMS.WebApi",
+  "DataType": "ACMS.WebApi.Models.DynamicData, ACMS.WebApi",
   "Steps": [
     {
       "Id": "GenerateTaskIdStep",
@@ -13,35 +13,38 @@
     },
     {
       "Id": "CallBPMApiStep",
-      "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.CallBPMApiStep, ACMS.WebApi",
-      "NextStepId": "WaitingForBPMAPIApprovalResponseEventLog",
+      "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.CallApiStep, ACMS.WebApi",
+      "NextStepId": "IfConditionAfterBPMApiCall",
       "Inputs": {
-        "TaskId": "data.TaskId",
-        "UserId": "data.UserId"
+        "Data": {
+          "@TaskId": "data[\"TaskId\"]",
+          "@UserId": "data[\"UserId\"]",
+          "@Url": "\"http://localhost:3000/bpm/api/approval-request\""
+        }
       },
       "Outputs": {
-        "ApiResponse1": "step.Response"
+        "ApiResponse1Success": "step.Response[\"success\"]"
       }
     },
-    //{
-    //  "Id": "IfConditionAfterBPMApiCall",
-    //  "StepType": "WorkflowCore.Primitives.If, WorkflowCore",
-    //  "NextStepId": "WaitingForBPMAPIApprovalResponseEventLog",
-    //  "Inputs": {
-    //    "Condition": "true"
-    //  },
-    //  "Do": [
-    //    [
-    //      {
-    //        "Id": "BPMApiCallFailureLog",
-    //        "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-    //        "Inputs": {
-    //          "Message": "\"[] BPM API Approval Request failed.\""
-    //        }
-    //      }
-    //    ]
-    //  ]
-    //}
+    {
+      "Id": "IfConditionAfterBPMApiCall",
+      "StepType": "WorkflowCore.Primitives.If, WorkflowCore",
+      "NextStepId": "WaitingForBPMAPIApprovalResponseEventLog",
+      "Inputs": {
+        "Condition": "!Convert.ToBoolean(data[\"ApiResponse1Success\"])"
+      },
+      "Do": [
+        [
+          {
+            "Id": "BPMApiCallFailureLog",
+            "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
+            "Inputs": {
+              "Message": "\"[] BPM API Approval Request failed.\""
+            }
+          }
+        ]
+      ]
+    },
     {
       "Id": "WaitingForBPMAPIApprovalResponseEventLog",
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
@@ -56,7 +59,7 @@
       "NextStepId": "ReceivedBPMAPIApprovalResponseEventLog",
       "Inputs": {
         "EventName": "\"BPMAPIApprovalResponseEvent\"",
-        "EventKey": "data.TaskId",
+        "EventKey": "data[\"TaskId\"]",
         "EffectiveDate": "DateTime.Now"
       },
       "Outputs": {
@@ -75,25 +78,31 @@
       "Id": "DecideApprovalStatus",
       "StepType": "WorkflowCore.Primitives.Decide, WorkflowCore",
       "SelectNextStep": {
-        "TriggerUiPathJobStep": "data.ApprovalStatus == \"Approved\"",
-        "NotifyEmployeeStep": "data.ApprovalStatus == \"Rejected\""
+        "TriggerUiPathJobStep": "object.Equals(data[\"ApprovalStatus\"], \"Approved\")",
+        "NotifyEmployeeStep": "object.Equals(data[\"ApprovalStatus\"], \"Rejected\")"
       }
     },
     {
       "Id": "TriggerUiPathJobStep",
-      "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.TriggerUiPathJobStep, ACMS.WebApi",
+      "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.CallApiStep, ACMS.WebApi",
       "NextStepId": "ScheduleStep",
       "Inputs": {
-        "TaskId": "data.TaskId"
+        "Data": {
+          "@TaskId": "data[\"TaskId\"]",
+          "@UserId": "data[\"UserId\"]",
+          "@Url": "\"http://localhost:3000/ui-path/api/start-job\""
+        }
       },
       "Outputs": {
-        "UiPathJobId": "step.UiPathJobId"
+        "UiPathJobId": "step.Response[\"uiPathJobId\"]"
       }
     },
     {
       "Id": "ScheduleStep",
       "StepType": "WorkflowCore.Primitives.Schedule, WorkflowCore",
-      "Inputs": { "Interval": "TimeSpan.FromSeconds(3)" },
+      "Inputs": {
+        "Interval": "TimeSpan.FromSeconds(3)"
+      },
       "Do": [
         [
           {
@@ -101,50 +110,75 @@
             "StepType": "WorkflowCore.Primitives.Recur, WorkflowCore",
             "Inputs": {
               "Interval": "TimeSpan.FromSeconds(3)",
-              "StopCondition": "data.IsDataPolled || data.PollingCount > 5"
+              "StopCondition": "object.Equals(Convert.ToString(data[\"PollUiPathJobStatus\"]), \"Ended\")"
             },
             "Do": [
               [
                 {
-                  "Id": "PollUiPathJobStatusStep",
-                  "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PollUiPathJobStatusStep, ACMS.WebApi",
-                  "NextStepId": "IfPollUiPathJobStatusSuccessStep",
+                  "Id": "RecurJobLog",
+                  "NextStepId": "PollUiPathJobStatusStep",
+                  "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
                   "Inputs": {
-                    "IsDataPolled": "data.IsDataPolled",
-                    "TaskId": "data.TaskId",
-                    "UiPathJobId": "data.UiPathJobId",
-                    "PollingCount": "data.PollingCount"
-                  },
-                  "Outputs": {
-                    "IsDataPolled": "step.IsDataPolled",
-                    "PollingCount": "step.PollingCount"
+                    "Message": "\"Job Status: \" + data[\"PollUiPathJobStatus\"] + \", PollingCount:\" + data[\"PollingCount\"]"
                   }
                 },
                 {
-                  "Id": "IfPollUiPathJobStatusSuccessStep",
-                  "StepType": "WorkflowCore.Primitives.If, WorkflowCore",
-                  "Inputs": { "Condition": "data.IsDataPolled" },
-                  "Do": [
-                    [
-                      {
-                        "Id": "NotifyEmployeeStepStep",
-                        "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.NotifyEmployeeStep, ACMS.WebApi",
-                        "NextStepId": "WorkflowEndedLogStep",
-                        "Inputs": {
-                          "TaskId": "data.TaskId",
-                          "ApprovalStatus": "data.ApprovalStatus"
+                  "Id": "PollUiPathJobStatusStep",
+                  "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.CallApiStep, ACMS.WebApi",
+                  "NextStepId": "TriggerUiPathJobIncreaseCounter",
+                  "Inputs": {
+                    "Data": {
+                      "@TaskId": "data[\"TaskId\"]",
+                      "@UserId": "data[\"UserId\"]",
+                      "@Url": "\"http://localhost:3000/ui-path/api/job-status\"",
+                      "@UiPathJobId": "data[\"UiPathJobId\"] ?? \"\"",
+                      "@PollingCount": "data[\"PollingCount\"] ?? 0"
+                    }
+                  },
+                  "Outputs": {
+                    "IsDataPolled": "step.Data[\"IsDataPolled\"]",
+                    "PollingCount": "step.Data[\"PollingCount\"]",
+                    "PollUiPathJobStatus": "step.Response[\"jobStatus\"]"
+                  }
+                },
+                {
+                  "Id": "TriggerUiPathJobIncreaseCounter",
+                  "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.IncrementStep, ACMS.WebApi",
+                  "NextStepId": "IfPollUiPathJobStatusSuccessStep",
+                  "Inputs": {
+                    "Value1": "data[\"PollingCount\"] ?? 0"
+                  },
+                  "Outputs": {
+                    "PollingCount": "Value2"
+                  }
+                },         
+                {
+                    "Id": "IfPollUiPathJobStatusSuccessStep",
+                    "StepType": "WorkflowCore.Primitives.If, WorkflowCore",
+                    "Inputs": {
+                      "Condition": "object.Equals(Convert.ToString(data[\"PollUiPathJobStatus\"]), \"Ended\")"
+                    },
+                    "Do": [
+                      [
+                        {
+                          "Id": "NotifyEmployeeStepStep",
+                          "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.NotifyEmployeeStep, ACMS.WebApi",
+                          "NextStepId": "WorkflowEndedLogStep",
+                          "Inputs": {
+                            "TaskId": "data[\"TaskId\"]",
+                            "ApprovalStatus": "data[\"ApprovalStatus\"]"
+                          }
+                        },
+                        {
+                          "Id": "WorkflowEndedLogStep",
+                          "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
+                          "Inputs": {
+                            "Message": "\"[] Workflow Ended 1.\""
+                          }
                         }
-                      },
-                      {
-                        "Id": "WorkflowEndedLogStep",
-                        "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-                        "Inputs": {
-                          "Message": "\"[] Workflow Ended 1.\""
-                        }
-                      }
+                      ]
                     ]
-                  ]
-                }
+                  }
               ]
             ]
           }
@@ -156,7 +190,7 @@
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.NotifyEmployeeStep, ACMS.WebApi",
       "NextStepId": "WorkflowEndedLogStep2",
       "Inputs": {
-        "TaskId": "data.TaskId",
+        "TaskId": "data[\"TaskId\"]",
         "ApprovalStatus": "data.ApprovalStatus"
       }
     },

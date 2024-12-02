@@ -26,6 +26,7 @@ builder.Services.AddWorkflowDSL();  // Register WorkflowCore.DSL
 // Configure RulesEngine (with rule loading service)
 builder.Services.AddSingleton<DynamicHttpClientService>();
 builder.Services.AddSingleton<RuleService>();
+builder.Services.AddSingleton<CallApiStep>();
 builder.Services.AddTransient<CallBPMApiStep>();
 builder.Services.AddTransient<TriggerUiPathJobStep>();
 builder.Services.AddTransient<PollUiPathJobStatusStep>();
@@ -54,8 +55,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 //var workflowJson = File.ReadAllText("Workflows/UnlockUser/workflow.json");  // Path to your workflow JSON file
-//var workflowJson = File.ReadAllText("Workflows/Transfers/EmployeeTransferWorkflow.json"); 
-var workflowJson = File.ReadAllText("Workflows/Transfers/EmployeeTransferWorkflowWithDynamicData.json");
+var workflowJson = File.ReadAllText("Workflows/Transfers/EmployeeTransferWorkflow.json");
+//var workflowJson = File.ReadAllText("Workflows/Transfers/EmployeeTransferWorkflowWithDynamicData.json");
 var loader = app.Services.GetRequiredService<IDefinitionLoader>();
 
 // Load the workflow definition from the JSON string

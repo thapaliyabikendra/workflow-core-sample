@@ -3,7 +3,7 @@ using ACMS.WebApi.Workflows.Transfers.Steps;
 using WorkflowCore.Interface;
 
 namespace ACMS.WebApi.Workflows.Transfers;
-public class EmployeeTransferWorkflow : IWorkflow<EmployeeTransferDataDto>
+public class SampleEmployeeTransferWorkflow : IWorkflow<EmployeeTransferDataDto>
 {
     public string Id => "EmployeeTransferWorkflow";
     public int Version => 1;

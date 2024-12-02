@@ -29,7 +29,7 @@ const axiosInstance = axios.create({
 
 
 // Endpoint to start a UiPath job
-app.post('/ui-path/api/start-job', async (req, res) => {
+app.get('/ui-path/api/start-job', async (req, res) => {
     try {
         // Get taskId from query parameters
         const { taskId } = req.query;
@@ -45,15 +45,15 @@ app.post('/ui-path/api/start-job', async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'UiPath Job started successfully',
-            UiPathJobId: uiPathJobId,
-            JobStatus: jobs[uiPathJobId].status
+            uiPathJobId: uiPathJobId,
+            jobStatus: jobs[uiPathJobId].status
         });
 
         // After 5 seconds, change the status of the job to "Ended"
         setTimeout(() => {
             jobs[uiPathJobId].status = 'Ended';
             console.log(`UiPath Job ${uiPathJobId} status updated to "Ended"`);
-        }, 4000);  // Simulate job completion after 5 seconds
+        }, 10000);  // Simulate job completion after 5 seconds
 
     } catch (error) {
         console.error('Error starting UiPath job:', error);
@@ -92,7 +92,7 @@ app.get('/ui-path/api/job-status', async (req, res) => {
         res.status(200).json({
             success: true,
             uiPathJobId,
-            JobStatus: jobStatus.status
+            jobStatus: jobStatus.status
         });
 
     } catch (error) {
@@ -106,7 +106,7 @@ app.get('/ui-path/api/job-status', async (req, res) => {
 });
 
 // Endpoint to simulate the BPM API call (from your original example)
-app.post('/bpm/api/approval-request', async (req, res) => {
+app.get('/bpm/api/approval-request', async (req, res) => {
     try {
         console.log(`'Request: ${JSON.stringify(req.query)}'`);
 

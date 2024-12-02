@@ -8,7 +8,7 @@ namespace ACMS.WebApi.Services;
 public class DynamicHttpClientService(HttpClient httpClient, ILogger<DynamicHttpClientService> logger)
 {
     #region Public Methods
-    public async Task<Dictionary<string, object>> CreateHttpClientAsync(CreateHttpClientDto input)
+    public async Task<JObject> CreateHttpClientAsync(CreateHttpClientDto input)
     {
         try
         {
@@ -34,17 +34,12 @@ public class DynamicHttpClientService(HttpClient httpClient, ILogger<DynamicHttp
             var parsedResponse = JToken.Parse(responseBody);
             var jObject =  GetJObject(parsedResponse);
 
-            var finalResult = ConvertToDynamicDictionary(jObject);
-            return finalResult;
-
-            // If neither, log and return an empty JObject or handle the case as needed
-            logger.LogWarning("Unexpected response format.");
-            throw new Exception("Unexpected response format");
+            return jObject;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "An unexpected error occurred.");
-            throw new ApplicationException("An unexpected error occurred.", ex);
+            throw new Exception("Internal Server Error");
         }
     }
 
@@ -67,28 +62,6 @@ public class DynamicHttpClientService(HttpClient httpClient, ILogger<DynamicHttp
     #endregion
 
     #region Private Methods
-    private Dictionary<string, object> ConvertToDynamicDictionary(JObject jObject)
-    {
-        var dictionary = new Dictionary<string, object>();
-
-        foreach (var property in jObject.Properties())
-        {
-            dictionary[property.Name] = ConvertJTokenToValue(property.Value);
-        }
-
-        return dictionary;
-    }
-
-    private object ConvertJTokenToValue(JToken token)
-    {
-        return token.Type switch
-        {
-            JTokenType.Object => ConvertToDynamicDictionary((JObject)token),
-            JTokenType.Array => token.Select(ConvertJTokenToValue).ToList(),
-            _ => token.ToObject<object>()
-        };
-    }
-
     private string BuildUrlWithQueryParams(Dictionary<string, object> requestConfig)
     {
         var url = requestConfig["url"]?.ToString() ?? string.Empty;

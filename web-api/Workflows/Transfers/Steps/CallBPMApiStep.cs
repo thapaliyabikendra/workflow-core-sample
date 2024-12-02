@@ -1,7 +1,6 @@
 ﻿using ACMS.WebApi.Models;
 using ACMS.WebApi.Services;
 using Newtonsoft.Json.Linq;
-using System.Runtime.InteropServices;
 using WorkflowCore.Interface;
 using WorkflowCore.Models;
 
@@ -11,8 +10,7 @@ public class CallBPMApiStep(DynamicHttpClientService dynamicHttpClientService, I
 {
     public string TaskId { get; set; }  // TaskId passed from the previous step
     public int UserId { get; set; }  // TaskId passed from the previous step
-    public string ResponsePrefix { get; set; }  
-    public Dictionary<string, object> Response { get; set; }
+    public JObject Response { get; set; }
 
     public override async Task<ExecutionResult> RunAsync(IStepExecutionContext context)
     {
@@ -24,7 +22,7 @@ public class CallBPMApiStep(DynamicHttpClientService dynamicHttpClientService, I
         return ExecutionResult.Next();
     }
 
-    private async Task<Dictionary<string, object>> CallBPMApiAsync()
+    private async Task<JObject> CallBPMApiAsync()
     {
         // Define your BPM API request configuration
         var requestConfigJson = new JObject

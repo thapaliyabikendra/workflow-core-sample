@@ -3,43 +3,49 @@ using ACMS.WebApi.Services;
 using Newtonsoft.Json.Linq;
 using WorkflowCore.Interface;
 using WorkflowCore.Models;
+using ExecutionResult = WorkflowCore.Models.ExecutionResult;
 
 namespace ACMS.WebApi.Workflows.Transfers.Steps;
 
-public class CallApiStep(DynamicHttpClientService httpClientService, ILogger<CallApiStep> logger) : StepBodyAsync
+public class CallApiStep(DynamicHttpClientService dynamicHttpClientService, ILogger<CallApiStep> logger) : StepBodyAsync
 {
-    private readonly ILogger _logger = logger;
-
-    public string RequestConfigJson { get; set; }
-    public Dictionary<string, object> Response { get; set; }
+    public JObject Data { get; set; }
+    public JObject Response { get; set; }
 
     public override async Task<ExecutionResult> RunAsync(IStepExecutionContext context)
     {
         try
         {
-            var inputDto = new CreateHttpClientDto
-            {
-                RequestConfig = RequestConfigJson
-            };
-
-            // Make the API call asynchronously
-            Response = await httpClientService.CreateHttpClientAsync(inputDto);
-
-            // If the response is null, log an error and throw an exception
-            if (Response == null)
-            {
-                _logger.LogError("API call failed");
-                throw new Exception("API call failed");
-            }
-
+            Response = await CallApiAsync();
             // Return the next step in the workflow
             return ExecutionResult.Next();
         }
         catch (Exception ex)
         {
-            // Log the exception and rethrow if you want to fail the workflow
-            _logger.LogError(ex, "An error occurred in the CallApiStep.");
-            throw; // This will cause the workflow to fail
+            logger.LogError(ex, "An error occurred in the CallApiStep.");
+            throw;
         }
+    }
+
+    private async Task<JObject> CallApiAsync()
+    {
+        // Define your BPM API request configuration
+        var requestConfigJson = new JObject
+        {
+            { "url", (string)Data["Url"]  },  // Replace with actual BPM API URL
+            { "httpMethod", "GET" },
+            { "queryParams", new JObject { { "userId", (int)Data["UserId"] }, { "taskId", (string)Data["TaskId"] }, { "uiPathJobId", (string)Data["UiPathJobId"] } } },
+            { "headers", new JObject { { "Accept", "application/json" } } }
+        }.ToString();
+
+        // Create input DTO for the dynamic HTTP client
+        var inputDto = new CreateHttpClientDto
+        {
+            RequestConfig = requestConfigJson
+        };
+
+        // Call the dynamic HTTP client service
+        var response = await dynamicHttpClientService.CreateHttpClientAsync(inputDto);
+        return response; 
     }
 }
