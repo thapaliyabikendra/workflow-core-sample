@@ -115,14 +115,6 @@
             "Do": [
               [
                 {
-                  "Id": "RecurJobLog",
-                  "NextStepId": "PollUiPathJobStatusStep",
-                  "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-                  "Inputs": {
-                    "Message": "\"Job Status: \" + data[\"PollUiPathJobStatus\"] + \", PollingCount:\" + data[\"PollingCount\"]"
-                  }
-                },
-                {
                   "Id": "PollUiPathJobStatusStep",
                   "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.CallApiStep, ACMS.WebApi",
                   "NextStepId": "TriggerUiPathJobIncreaseCounter",
@@ -144,41 +136,49 @@
                 {
                   "Id": "TriggerUiPathJobIncreaseCounter",
                   "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.IncrementStep, ACMS.WebApi",
-                  "NextStepId": "IfPollUiPathJobStatusSuccessStep",
+                  "NextStepId": "RecurJobLog",
                   "Inputs": {
                     "Value1": "data[\"PollingCount\"] ?? 0"
                   },
                   "Outputs": {
                     "PollingCount": "Value2"
                   }
-                },         
+                },
                 {
-                    "Id": "IfPollUiPathJobStatusSuccessStep",
-                    "StepType": "WorkflowCore.Primitives.If, WorkflowCore",
-                    "Inputs": {
-                      "Condition": "object.Equals(Convert.ToString(data[\"PollUiPathJobStatus\"]), \"Ended\")"
-                    },
-                    "Do": [
-                      [
-                        {
-                          "Id": "NotifyEmployeeStepStep",
-                          "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.NotifyEmployeeStep, ACMS.WebApi",
-                          "NextStepId": "WorkflowEndedLogStep",
-                          "Inputs": {
-                            "TaskId": "data[\"TaskId\"]",
-                            "ApprovalStatus": "data[\"ApprovalStatus\"]"
-                          }
-                        },
-                        {
-                          "Id": "WorkflowEndedLogStep",
-                          "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-                          "Inputs": {
-                            "Message": "\"[] Workflow Ended 1.\""
-                          }
-                        }
-                      ]
-                    ]
+                  "Id": "RecurJobLog",
+                  "NextStepId": "IfPollUiPathJobStatusSuccessStep",
+                  "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
+                  "Inputs": {
+                    "Message": "\"Job Status: \" + data[\"PollUiPathJobStatus\"] + \", PollingCount:\" + data[\"PollingCount\"]"
                   }
+                },
+                {
+                  "Id": "IfPollUiPathJobStatusSuccessStep",
+                  "StepType": "WorkflowCore.Primitives.If, WorkflowCore",
+                  "Inputs": {
+                    "Condition": "object.Equals(Convert.ToString(data[\"PollUiPathJobStatus\"]), \"Ended\")"
+                  },
+                  "Do": [
+                    [
+                      {
+                        "Id": "NotifyEmployeeStepStep",
+                        "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.NotifyEmployeeStep, ACMS.WebApi",
+                        "NextStepId": "WorkflowEndedLogStep",
+                        "Inputs": {
+                          "TaskId": "data[\"TaskId\"]",
+                          "ApprovalStatus": "data[\"ApprovalStatus\"]"
+                        }
+                      },
+                      {
+                        "Id": "WorkflowEndedLogStep",
+                        "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
+                        "Inputs": {
+                          "Message": "\"[] Workflow Ended 1.\""
+                        }
+                      }
+                    ]
+                  ]
+                }
               ]
             ]
           }

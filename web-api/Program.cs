@@ -11,6 +11,7 @@ using Nest;
 using System.Linq.Dynamic.Core;
 using WorkflowCore.Interface;
 using WorkflowCore.Services.DefinitionStorage;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 var builder = WebApplication.CreateBuilder(args);
 var sqliteConnectionString = @"Data Source=employees.db;";
@@ -42,7 +43,16 @@ builder.Services
     .AddDbContext<EmployeeContext>(options =>
         options.UseSqlite(sqliteConnectionString));
 
+builder.Host.ConfigureLogging((context, logging) =>
+  {
+      logging.ClearProviders();
+      logging.AddConsole(); // or any other logging provider
+      logging.SetMinimumLevel(LogLevel.Information); // default level for all logs
 
+      logging.AddFilter("System.Net.Http", LogLevel.Warning); // Set System.Net.Http logs to Warning level
+      logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+      logging.AddFilter("WorkflowCore.Services.BackgroundTasks.IndexConsumer", LogLevel.Error); // Set to Error to suppress Warning level logs
+  });
 var app = builder.Build();
 
 // Ensure that the database schema is created
