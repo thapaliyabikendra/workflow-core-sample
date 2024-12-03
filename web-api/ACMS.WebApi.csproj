@@ -4,26 +4,34 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>2f9ab095-7b0e-4e2f-8180-85aa47978380</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+	  <!--<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />-->
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageReference Include="RulesEngine" Version="5.0.3" />
     <PackageReference Include="WorkflowCore" Version="3.11.0" />
     <PackageReference Include="WorkflowCore.DSL" Version="3.11.0" />
-    <PackageReference Include="WorkflowCore.Persistence.Sqlite" Version="3.11.0" />
+	  <PackageReference Include="WorkflowCore.Persistence.PostgreSQL" Version="3.11.0" />
+	  <PackageReference Include="WorkflowCore.Persistence.Sqlite" Version="3.11.0" />
     <PackageReference Include="WorkflowCore.Providers.Elasticsearch" Version="3.11.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\" />
     <Folder Include="Samples\" />
   </ItemGroup>
 

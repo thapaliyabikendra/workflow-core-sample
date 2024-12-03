@@ -1,26 +1,27 @@
 using ACMS.WebApi.EntityFrameworkCore;
 using ACMS.WebApi.Extensions;
-using ACMS.WebApi.Models;
 using ACMS.WebApi.Services;
 using ACMS.WebApi.Utilities;
-using ACMS.WebApi.Workflows.Transfers;
 using ACMS.WebApi.Workflows.Transfers.Steps;
 using ACMS.WebApi.Workflows.UnlockUser;
 using Microsoft.EntityFrameworkCore;
 using Nest;
-using System.Linq.Dynamic.Core;
 using WorkflowCore.Interface;
 using WorkflowCore.Services.DefinitionStorage;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 var builder = WebApplication.CreateBuilder(args);
-var sqliteConnectionString = @"Data Source=employees.db;";
+var configuration = builder.Configuration;
+//var sqliteConnectionString = @"Data Source=employees.db;";
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
 builder.Services.AddWorkflow(cfg =>
 {
     //cfg.UseSqlite(sqliteConnectionString, true);
-    cfg.UseElasticsearch(new ConnectionSettings(new Uri("http://localhost:9200")), "ACMS_Workflows_index");
+    cfg.UsePostgreSQL(configuration.GetConnectionString("Default"), true, true);
+    var esUri = builder.Configuration["Elasticsearch:Uri"];
+    var esIndex = builder.Configuration["Elasticsearch:IndexName"];
+    cfg.UseElasticsearch(new ConnectionSettings(new Uri(esUri)), esIndex);
 });
 builder.Services.AddWorkflowDSL();  // Register WorkflowCore.DSL
 
@@ -39,9 +40,11 @@ builder.Services.AddSingleton(serviceProvider =>
     return ruleService.GetRulesEngine();
 });
 // Register the EmployeeContext and configure SQLite
-builder.Services
-    .AddDbContext<EmployeeContext>(options =>
-        options.UseSqlite(sqliteConnectionString));
+//builder.Services
+//    .AddDbContext<EmployeeContext>(options =>
+//        options.UseSqlite(sqliteConnectionString));
+builder.Services.AddDbContext<EmployeeContext>(options =>
+        options.UseNpgsql(configuration.GetConnectionString("Default")));
 
 builder.Host.ConfigureLogging((context, logging) =>
   {
