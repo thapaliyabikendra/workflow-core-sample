@@ -3,13 +3,13 @@ using WorkflowCore.Models;
 
 namespace ACMS.WebApi.Workflows.Transfers.Steps;
 
-public class PrintMessageStep : StepBody
+public class PrintMessageStep(ILogger<PrintMessageStep> logger) : StepBody
 {
     public string Message { get; set; }
 
     public override ExecutionResult Run(IStepExecutionContext context)
     {
-        Console.WriteLine(Message);
+        logger.LogInformation(Message);
         return ExecutionResult.Next();
     }
 }

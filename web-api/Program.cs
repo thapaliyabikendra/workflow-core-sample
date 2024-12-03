@@ -1,16 +1,41 @@
 using ACMS.WebApi.EntityFrameworkCore;
 using ACMS.WebApi.Extensions;
+using ACMS.WebApi.Middlewares;
 using ACMS.WebApi.Services;
 using ACMS.WebApi.Utilities;
 using ACMS.WebApi.Workflows.Transfers.Steps;
 using ACMS.WebApi.Workflows.UnlockUser;
 using Microsoft.EntityFrameworkCore;
 using Nest;
+using Serilog;
 using WorkflowCore.Interface;
 using WorkflowCore.Services.DefinitionStorage;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using Microsoft.Extensions.Logging;
+using Serilog.Events;
+
+Log.Logger = new LoggerConfiguration()
+#if DEBUG
+            //.MinimumLevel.Debug()
+#else
+#endif
+            .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+            .MinimumLevel.Override("System.Net.Http", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+            .MinimumLevel.Override("WorkflowCore.Services.BackgroundTasks.IndexConsumer", LogEventLevel.Warning)
+            .MinimumLevel.Override("ACMS.WebApi.Services.DynamicHttpClientService", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.HttpRequestIn", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.HttpRequestOut", LogEventLevel.Warning)
+            //.WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}")
+            .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss} [{Level}] WorkflowId={@WorkflowId} StepId={@StepId}: {Message} {NewLine}{Exception}")
+            .Enrich.FromLogContext() // To include log scope data
+            .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog();
+
 var configuration = builder.Configuration;
 //var sqliteConnectionString = @"Data Source=employees.db;";
 builder.Services.AddOpenApi();
@@ -24,11 +49,13 @@ builder.Services.AddWorkflow(cfg =>
     cfg.UseElasticsearch(new ConnectionSettings(new Uri(esUri)), esIndex);
 });
 builder.Services.AddWorkflowDSL();  // Register WorkflowCore.DSL
+builder.Services.AddWorkflowStepMiddleware<LogCorrelationStepMiddleware>();
 
 // Configure RulesEngine (with rule loading service)
 builder.Services.AddSingleton<DynamicHttpClientService>();
 builder.Services.AddSingleton<RuleService>();
 builder.Services.AddSingleton<CallApiStep>();
+builder.Services.AddSingleton<PrintMessageStep>();
 builder.Services.AddTransient<CallBPMApiStep>();
 builder.Services.AddTransient<TriggerUiPathJobStep>();
 builder.Services.AddTransient<PollUiPathJobStatusStep>();
@@ -46,17 +73,6 @@ builder.Services.AddSingleton(serviceProvider =>
 builder.Services.AddDbContext<EmployeeContext>(options =>
         options.UseNpgsql(configuration.GetConnectionString("Default")));
 
-builder.Host.ConfigureLogging((context, logging) =>
-  {
-      logging.ClearProviders();
-      logging.AddConsole(); // or any other logging provider
-      logging.SetMinimumLevel(LogLevel.Information); // default level for all logs
-
-      logging.AddFilter("System.Net.Http", LogLevel.Warning); // Set System.Net.Http logs to Warning level
-      logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
-      logging.AddFilter("WorkflowCore.Services.BackgroundTasks.IndexConsumer", LogLevel.Error);
-      logging.AddFilter("ACMS.WebApi.Services.DynamicHttpClientService", LogLevel.Error); 
-  });
 var app = builder.Build();
 
 // Ensure that the database schema is created
