@@ -11,10 +11,28 @@ Content-Type: application/json
 Accept: application/json
 
 ### Start UiPath Job - POST request
-POST http://localhost:3000/ui-path/api/start-job?taskId=e81f0a11-a62b-4f0e-9bdf-285663861035
+POST {{HostAddress}}/ui-path/api/start-job?taskId=e81f0a11-a62b-4f0e-9bdf-285663861035
 Content-Type: application/json
 Accept: application/json
 
 ### Get UiPath Job Status - GET request
-GET http://localhost:3000/ui-path/api/job-status?uiPathJobId=515655b1-cefe-4b1c-819b-d7d32be935e9
+GET {{HostAddress}}/ui-path/api/job-status?uiPathJobId=515655b1-cefe-4b1c-819b-d7d32be935e9
 Accept: application/json
+
+### Update Job Status to In-Progress
+POST {{HostAddress}}/ui-path/api/update-job-status
+Content-Type: application/json
+
+{
+  "uiPathJobId": "515655b1-cefe-4b1c-819b-d7d32be935e9",
+  "newStatus": "In-Progress"
+}
+
+### Update Job Status to Ended
+POST {{HostAddress}}/ui-path/api/update-job-status
+Content-Type: application/json
+
+{
+  "uiPathJobId": "515655b1-cefe-4b1c-819b-d7d32be935e9",
+  "newStatus": "Ended"
+}

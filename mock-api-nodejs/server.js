@@ -50,10 +50,10 @@ app.get('/ui-path/api/start-job', async (req, res) => {
         });
 
         // After 5 seconds, change the status of the job to "Ended"
-        setTimeout(() => {
-            jobs[uiPathJobId].status = 'Ended';
-            console.log(`UiPath Job ${uiPathJobId} status updated to "Ended"`);
-        }, 10000);  // Simulate job completion after 5 seconds
+        // setTimeout(() => {
+        //     jobs[uiPathJobId].status = 'Ended';
+        //     console.log(`UiPath Job ${uiPathJobId} status updated to "Ended"`);
+        // }, 10000);  // Simulate job completion after 5 seconds
 
     } catch (error) {
         console.error('Error starting UiPath job:', error);
@@ -61,6 +61,41 @@ app.get('/ui-path/api/start-job', async (req, res) => {
             success: false,
             message: 'An error occurred while starting the UiPath job',
             error: error.message
+        });
+    }
+});
+
+// Endpoint to update UiPath job status
+app.post('/ui-path/api/update-job-status', async (req, res) => {
+    try {
+        const { uiPathJobId, newStatus } = req.body;
+
+        // Check if the job exists
+        if (!jobs[uiPathJobId]) {
+            return res.status(404).json({
+                success: false,
+                message: 'Job not found',
+            });
+        }
+
+        // Update the status of the job
+        jobs[uiPathJobId].status = newStatus;
+        console.log(`Job ${uiPathJobId} status updated to ${newStatus}`);
+
+        // Respond with success message
+        res.status(200).json({
+            success: true,
+            message: `Job status updated to ${newStatus}`,
+            uiPathJobId: uiPathJobId,
+            jobStatus: jobs[uiPathJobId].status,
+        });
+
+    } catch (error) {
+        console.error('Error updating UiPath job status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while updating the job status',
+            error: error.message,
         });
     }
 });
@@ -119,7 +154,7 @@ app.get('/bpm/api/approval-request', async (req, res) => {
             console.log(`'Response: ${JSON.stringify(successResponse)}'`);
             res.status(200).json(successResponse);
 
-            setTimeout(() => callWebhook(req.query.taskId, 'Approved'), 5000);
+            // setTimeout(() => callWebhook(req.query.taskId, 'Approved'), 5000);
         } else {
             const failedResponse = {
                 success: false,
