@@ -1,6 +1,6 @@
 ﻿@HostAddress = http://localhost:5283
 
-### 1. Get All Workflows (Search for workflows)
+### Get All Workflows (Search for workflows)
 GET {{HostAddress}}/api/workflows?terms=&status=0&type=&skip=0&take=100&createdFrom=2024-12-02
 
 Parameters:
@@ -27,7 +27,7 @@ Response:
   ]
 }
 
-### 2. Get a Single Workflow by ID
+### Get a Single Workflow by ID
 GET {{HostAddress}}/api/workflows/8f780f2b-3cef-4199-be10-855d5bb31c2f
 
 Parameters:
@@ -43,7 +43,7 @@ Response:
   "data": {...}  // Workflow-specific data
 }
 
-### 3. Start a Workflow (Post with data)
+### Start a Workflow (Post with data)
 POST {{HostAddress}}/api/workflows/905f8d9b-8828-46aa-a166-b08565fa3ecd
 
 Parameters:
@@ -55,3 +55,18 @@ Parameters:
 {
   "key": "value"
 }
+
+### Suspend a workflow (PUT)
+PUT {{HostAddress}}/api/workflows/12345/suspend
+Accept: application/json
+Content-Type: application/json
+
+### Resume a workflow (PUT)
+PUT {{HostAddress}}/api/workflows/12345/resume
+Accept: application/json
+Content-Type: application/json
+
+### Terminate a workflow (DELETE)
+DELETE {{HostAddress}}/api/workflows/12345
+Accept: application/json
+Content-Type: application/json
