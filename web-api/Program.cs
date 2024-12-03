@@ -50,6 +50,7 @@ builder.Services.AddWorkflow(cfg =>
 });
 builder.Services.AddWorkflowDSL();  // Register WorkflowCore.DSL
 builder.Services.AddWorkflowStepMiddleware<LogCorrelationStepMiddleware>();
+builder.Services.AddTransient<IWorkflowMiddlewareErrorHandler, CustomWorkflowErrorHandler>();
 
 // Configure RulesEngine (with rule loading service)
 builder.Services.AddSingleton<DynamicHttpClientService>();
