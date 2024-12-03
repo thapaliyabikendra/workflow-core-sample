@@ -8,11 +8,9 @@ using ACMS.WebApi.Workflows.UnlockUser;
 using Microsoft.EntityFrameworkCore;
 using Nest;
 using Serilog;
+using Serilog.Events;
 using WorkflowCore.Interface;
 using WorkflowCore.Services.DefinitionStorage;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-using Microsoft.Extensions.Logging;
-using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
 #if DEBUG

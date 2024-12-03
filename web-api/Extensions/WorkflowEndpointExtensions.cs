@@ -30,7 +30,7 @@ public static class WorkflowEndpointExtensions
 
         // Map the POST /api/workflows/{id}/{version} endpoint
         endpoints.MapPost("/api/workflows/{id}/{version?}", async (
-            string id, int? version, string reference, [FromBody] JObject data,
+            string id, int? version, [FromBody] object data,
             IWorkflowRegistry registry, IWorkflowController workflowService) =>
         {
             var def = registry.GetDefinition(id, version);
@@ -42,11 +42,11 @@ public static class WorkflowEndpointExtensions
             {
                 var dataStr = JsonConvert.SerializeObject(data);
                 var dataObj = JsonConvert.DeserializeObject(dataStr, def.DataType);
-                workflowId = await workflowService.StartWorkflow(id, version, dataObj, reference);
+                workflowId = await workflowService.StartWorkflow(id, version, dataObj);
             }
             else
             {
-                workflowId = await workflowService.StartWorkflow(id, version, null, reference);
+                workflowId = await workflowService.StartWorkflow(id, version, null);
             }
 
             return Results.Ok(workflowId);

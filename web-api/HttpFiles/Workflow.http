@@ -3,58 +3,15 @@
 ### Get All Workflows (Search for workflows)
 GET {{HostAddress}}/api/workflows?terms=&status=0&type=&skip=0&take=100&createdFrom=2024-12-02
 
-Parameters:
-- terms (string): Search terms.
-- status (enum - WorkflowStatus): Workflow status to filter by.
-- type (string): Workflow type (Definition ID).
-- createdFrom (datetime): Start date range for created workflows.
-- createdTo (datetime): End date range for created workflows.
-- skip (int): Number of workflows to skip (for pagination).
-- take (int): Number of workflows to return (pagination).
-
-Response:
-200 OK
-{
-  "totalCount": 10,
-  "results": [
-    {
-      "id": "workflow_id_1",
-      "status": "Running",
-      "createdTime": "2024-11-01T12:00:00Z",
-      "type": "workflow_type_1"
-    },
-    ...
-  ]
-}
-
 ### Get a Single Workflow by ID
 GET {{HostAddress}}/api/workflows/8f780f2b-3cef-4199-be10-855d5bb31c2f
 
-Parameters:
-- id (string): The workflow ID.
-
-Response:
-200 OK
-{
-  "id": "workflow_id_1",
-  "status": "Running",
-  "createdTime": "2024-11-01T12:00:00Z",
-  "type": "workflow_type_1",
-  "data": {...}  // Workflow-specific data
-}
-
 ### Start a Workflow (Post with data)
-POST {{HostAddress}}/api/workflows/905f8d9b-8828-46aa-a166-b08565fa3ecd
+POST {{HostAddress}}/api/workflows/EmployeeTransferWorkflow
+Content-Type: application/json
+Accept: application/json
 
-Parameters:
-- id (string): The workflow definition ID.
-- version (int, optional): The version of the workflow definition (if provided).
-- reference (string, optional): Reference for the workflow instance.
-- body (JSON): The data payload to start the workflow (optional, depending on the definition).
-
-{
-  "key": "value"
-}
+{"UserId": 1, "NewBranch": "Branch B"}
 
 ### Suspend a workflow (PUT)
 PUT {{HostAddress}}/api/workflows/12345/suspend
