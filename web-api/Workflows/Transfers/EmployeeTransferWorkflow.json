@@ -2,7 +2,7 @@
   "Id": "EmployeeTransferWorkflow",
   "Version": 1,
   "DataType": "ACMS.WebApi.Models.DynamicData, ACMS.WebApi",
-  "DefaultErrorBehavior": "Terminate",
+  "DefaultErrorBehavior": "Compensate",
   "Steps": [
     {
       "Id": "GenerateTaskIdStep",
@@ -15,15 +15,33 @@
     {
       "Id": "RequestedStageLog",
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-      "NextStepId": "CallBPMApiStep",
+      "NextStepId": "ProcessingStageLog",
       "Inputs": {
         "Message": "\"Started - Task ID : \" +  data[\"TaskId\"] + \" generated\""
       }
     },
     {
+      "Id": "ProcessingStageLog",
+      "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
+      "NextStepId": "CallBPMApiStep",
+      "Inputs": {
+        "Message": "\"Requested - Calling BPM API for approval request\""
+      }
+    },
+    {
       "Id": "CallBPMApiStep",
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.CallApiStep, ACMS.WebApi",
-      "NextStepId": "ProcessingStageLog",
+      "NextStepId": "IfConditionAfterBPMApiCall",
+      "CompensateWith": [
+        {
+          "Id": "LogErrorForBPMAPi",
+          "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
+          //"NextStepId": "EndWorkflow",
+          "Inputs": {
+            "Message": "\"Failed - BPM API Approval Request failed (Compensate)\""
+          }
+        }
+      ],
       "Inputs": {
         "Data": {
           "@TaskId": "data[\"TaskId\"]",
@@ -33,14 +51,6 @@
       },
       "Outputs": {
         "ApiResponse1Success": "step.Response[\"success\"]"
-      }
-    },
-    {
-      "Id": "ProcessingStageLog",
-      "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-      "NextStepId": "IfConditionAfterBPMApiCall",
-      "Inputs": {
-        "Message": "\"Requested - Calling BPM API for approval request\""
       }
     },
     {
@@ -55,6 +65,7 @@
           {
             "Id": "BPMApiCallFailureLog",
             "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
+            "NextStepId": "EndWorkflow",
             "Inputs": {
               "Message": "\"Failed - BPM API Approval Request failed\""
             }
@@ -127,7 +138,7 @@
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
       "NextStepId": "ScheduleStep",
       "Inputs": {
-        "Message": "\"Processing - Role Change triggered\""
+        "Message": "\"Processing - Role Change triggered, UiPathJobId: \" +  data[\"UiPathJobId\"]"
       }
     },
     {
@@ -143,7 +154,7 @@
             "StepType": "WorkflowCore.Primitives.Recur, WorkflowCore",
             "Inputs": {
               "Interval": "TimeSpan.FromSeconds(3)",
-              "StopCondition": "object.Equals(Convert.ToString(data[\"PollUiPathJobStatus\"]), \"Ended\")"
+              "StopCondition": "object.Equals(Convert.ToString(data[\"PollUiPathJobStatus\"]), \"Ended\") || Convert.ToInt32(data[\"PollingCount\"]) > 20"
             },
             "Do": [
               [
@@ -214,16 +225,9 @@
                       {
                         "Id": "NotifyEmp1",
                         "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-                        "NextStepId": "WorkflowEndedLogStep",
+                        "NextStepId": "EndWorkflow",
                         "Inputs": {
                           "Message": "\"Processing - Notification sent to employee\""
-                        }
-                      },
-                      {
-                        "Id": "WorkflowEndedLogStep",
-                        "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-                        "Inputs": {
-                          "Message": "\"Completed - Workflow Ended\""
                         }
                       }
                     ]
@@ -240,8 +244,9 @@
                       {
                         "Id": "RoleChangefailedLog",
                         "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
+                        "NextStepId": "EndWorkflow",
                         "Inputs": {
-                          "Message": "\"Processing - Role Change failed\""
+                          "Message": "\"Failed - Role Change failed\""
                         }
                       }
                     ]
@@ -273,17 +278,22 @@
     {
       "Id": "NotifyEmp2",
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
-      "NextStepId": "WorkflowEndedLogStep2",
+      "NextStepId": "EndWorkflow",
       "Inputs": {
         "Message": "\"Processing - Notification sent to employee\""
       }
     },
     {
-      "Id": "WorkflowEndedLogStep2",
+      "Id": "EndWorkflow",
+      "NextStepId": "EndWorkflowStep",
       "StepType": "ACMS.WebApi.Workflows.Transfers.Steps.PrintMessageStep, ACMS.WebApi",
       "Inputs": {
-        "Message": "\"Completed - Workflow Ended 2\""
+        "Message": "\"Completed - End Workflow \""
       }
+    },
+    {
+      "Id": "EndWorkflowStep",
+      "StepType": "WorkflowCore.Primitives.EndStep, WorkflowCore"
     }
   ]
 }

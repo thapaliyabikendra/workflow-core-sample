@@ -33,6 +33,6 @@ POST {{HostAddress}}/ui-path/api/update-job-status
 Content-Type: application/json
 
 {
-  "uiPathJobId": "6961252a-c7c2-48ba-bfab-168a8ed4476b",
+  "uiPathJobId": "f7c66404-b832-4171-a3f0-a0e579b7abde",
   "newStatus": "Ended"
 }

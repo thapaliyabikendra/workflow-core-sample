@@ -4,7 +4,7 @@
 GET {{HostAddress}}/api/workflows?terms=&status=0&type=&skip=0&take=100&createdFrom=2024-12-02
 
 ### Get a Single Workflow by ID
-GET {{HostAddress}}/api/workflows/131ca5fc-7b9b-4fc1-8de7-c6a1a535b607
+GET {{HostAddress}}/api/workflows/2d4e248c-72a2-48cb-8388-2f6a4479ebc7
 
 ### Start a Workflow (Post with data)
 POST {{HostAddress}}/api/workflows/EmployeeTransferWorkflow
@@ -24,6 +24,6 @@ Accept: application/json
 Content-Type: application/json
 
 ### Terminate a workflow (DELETE)
-DELETE {{HostAddress}}/api/workflows/12345
+DELETE {{HostAddress}}/api/workflows/b4ac43cf-612e-4dac-87e8-136b7d24ad50
 Accept: application/json
 Content-Type: application/json
