@@ -6,7 +6,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "TaskId": "4d8f4308-d1b0-408b-80fd-ff4c377ffab4",
+  "TaskId": "f6ce2bcb-3566-4ba6-baaf-ce8844db0829",
   "ApprovalStatus": "Approved"
 }
 
@@ -16,6 +16,6 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "TaskId": "0f668980-d631-4bbc-8f7b-929f73362d52",
+  "TaskId": "dbac2777-8bd8-447c-bf23-e939ad5e03f5",
   "ApprovalStatus": "Rejected"
 }

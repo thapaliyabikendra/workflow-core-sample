@@ -144,8 +144,9 @@ app.get('/ui-path/api/job-status', async (req, res) => {
 app.get('/bpm/api/approval-request', async (req, res) => {
     try {
         console.log(`'Request: ${JSON.stringify(req.query)}'`);
+        const allowedUserIds = [1, 2];
 
-        if (req.query.userId == 1) {
+        if (allowedUserIds.includes(parseInt(req.query.userId))) {
             const successResponse = {
                 success: true,
                 code: 200,

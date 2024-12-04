@@ -53,7 +53,7 @@ public class SampleEmployeeTransferWorkflow : IWorkflow<EmployeeTransferDataDto>
                 .Input(step => step.UserId, data => data.UserId)
                 .Output(data => data.ApiResponse1, step => step.Response)
             //.OnError(WorkflowErrorHandling.Terminate)
-            .If(data => data.ApiResponse1.Value<bool>("success")) // if relevant http status code is not returned
+            .If(data => !data.ApiResponse1.Value<bool>("success")) // if relevant http status code is not returned
             .Do(s =>
                  s.Then(context => Console.WriteLine("[] BPM API Approval Request failed."))
                  .EndWorkflow()

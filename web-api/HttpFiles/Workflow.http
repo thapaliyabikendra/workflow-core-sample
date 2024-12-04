@@ -4,7 +4,7 @@
 GET {{HostAddress}}/api/workflows?terms=&status=0&type=&skip=0&take=100&createdFrom=2024-12-02
 
 ### Get a Single Workflow by ID
-GET {{HostAddress}}/api/workflows/8f780f2b-3cef-4199-be10-855d5bb31c2f
+GET {{HostAddress}}/api/workflows/131ca5fc-7b9b-4fc1-8de7-c6a1a535b607
 
 ### Start a Workflow (Post with data)
 POST {{HostAddress}}/api/workflows/EmployeeTransferWorkflow
@@ -14,12 +14,12 @@ Accept: application/json
 {"UserId": 1, "NewBranch": "Branch B"}
 
 ### Suspend a workflow (PUT)
-PUT {{HostAddress}}/api/workflows/12345/suspend
+PUT {{HostAddress}}/api/workflows/b4ac43cf-612e-4dac-87e8-136b7d24ad50/suspend
 Accept: application/json
 Content-Type: application/json
 
 ### Resume a workflow (PUT)
-PUT {{HostAddress}}/api/workflows/12345/resume
+PUT {{HostAddress}}/api/workflows/b4ac43cf-612e-4dac-87e8-136b7d24ad50/resume
 Accept: application/json
 Content-Type: application/json
 
