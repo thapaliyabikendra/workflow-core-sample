@@ -29,7 +29,7 @@ const axiosInstance = axios.create({
 
 
 // Endpoint to start a UiPath job
-app.get('/ui-path/api/start-job', async (req, res) => {
+app.post('/ui-path/api/start-job', async (req, res) => {
     try {
         // Get taskId from query parameters
         const { taskId } = req.query;
@@ -141,7 +141,7 @@ app.get('/ui-path/api/job-status', async (req, res) => {
 });
 
 // Endpoint to simulate the BPM API call (from your original example)
-app.get('/bpm/api/approval-request', async (req, res) => {
+app.post('/bpm/api/approval-request', async (req, res) => {
     try {
         console.log(`'Request: ${JSON.stringify(req.query)}'`);
         const allowedUserIds = [1, 2];
